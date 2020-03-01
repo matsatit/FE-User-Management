@@ -1,102 +1,86 @@
-# Cài đặt Unit Test với Karrma
-Trong phần này chúng ta sẽ đi qua các bước để thêm Unit Test vào cho dự án dựa trên thư viện Karma.
+# Cài đặt Code Coverage
+**Code Coverage**: Là một tiêu chuẩn trong việc viết UT, UT phải đáp ứng được các tiêu chuẩn đưa ra như số dòng được test, số nhánh được test, ... thì mới được gọi là pass.
 
-Tại sao phải là Karma: bởi vì các Unit Test framework thường sẽ không chạy code của bạn với Browser thực mà chạy với Browser ảo như PhantomJS hay JSDom. Karma sẽ hỗ trợ bạn chạy code Unit Test với Browser thực như Chrome, Firefox, ... 
+Phần này chúng ta sẽ tìm hiểu làm sao xuất Code Coverage ra để xem.
 
-Bạn có thể tham khảo thêm: http://karma-runner.github.io/4.0/config/browsers.html
-
-# Thư viện cho Unit Test thông thường:
+# Cài đặt thư viện
+Để tạo report Code Coverage chúng ta cần các thư viện sau
 ```
-npm i mocha chai --save-dev
+npm install istanbul-instrumenter-loader karma-coverage-istanbul-reporter --save-dev
 ```
-`Mocha`: Là Unit Test framework, sử dụng cả Front End, Back End, thư viện này sẽ giúp chúng ta viết các test cases cần thiết.
+Đây là thư viện giúp tạo ra report cũng như chèn code gốc vào report để xem.
 
-`Chai`: Thư viện này giúp chúng ta có thể viết assertion cho test cases.
+# Cài đặt để chạy với Webpack
+1. Cấu hình load các file source phục vụ cho report kết quả test
 
-`Sinon`: Thư viện cho việc Mocking đầu vào, bạn có thể tìm hiểu thêm, trong phạm vi bài này không sử dụng thư viện này. 
-
-# Thư viện cho Karma
-```
-npm i karma karma-chrome-launcher karma-firefox-launcher karma-cli karma-mocha karma-sourcemap-loader karma-webpack puppeteer --save-dev
-```
-`Karma`, `Karma-cli`: Thư viện chính của Karma
-
-`*-laucher`: Giúp chúng ta có thể chạy test được trên các Browser tương ứng như Chrome, Firefox, ...
-
-`puppeteer`: Bộ Chromium phát triển bở Google, chúng ta sẽ nói nhiều hơn ở phần Automation test.
-
-# Cấu hình dự án
-- Bạn thêm dòng này vào `webpack.config.js` để có thể thấy source code và debug ở môi trường DEV
+Thêm rule vào webpack config
 ```javascript
-module.exports = {
-    devtool: 'inline-source-map',
-}
-```
-- `karma.conf.js`
-```javascript
-var webpackConfig = require('./webpack.config.js');
-
-process.env.CHROME_BIN = require('puppeteer').executablePath()
-
-module.exports = function (config) {
-    config.set({
-        // Framework sử dụng ở bài này là mocha, nếu bạn sử dụng fw khác, có thể thêm vào
-        frameworks: ['mocha'],
-
-        port: 9876, // Port chạy debug
-        colors: true,
-        logLevel: config.LOG_INFO,
-        autoWatch: false, // True nghĩa là chạy và chờ các file test thay đổi để chạy lại, chờ để debug,... Môi trường PRO bạn cần đặt là false.
-        // browsers: ['Chrome', 'Firefox'],
-        browsers: ['ChromeHeadless', 'FirefoxHeadless'],
-        singleRun: false, // Chạy song song hay chạy đồng thời trên các Browsers
-        autoWatchBatchDelay: 300,
-        
-        // Danh sách các file sẽ được load vào Browser để chạy test
-        files: [
-            'test/suites/helloworld-test-suite.js',
-            // 'test/**/*-Test.js',
-		],
-
-        preprocessors: {
-            'test/suites/helloworld-test-suite.js': ['webpack', 'sourcemap']
-            // 'test/**/*-Test.js': ['webpack', 'sourcemap']
+webpackConfig.module.rules.push(
+    {
+        test: /\.(js|jsx)$/i,
+        include: path.resolve("src"), // Thư mục chứa source
+        exclude: path.resolve(__dirname, "node_modules"),
+        enforce: "post", // Luôn chạy rule này sau các rule đã định nghĩa
+        use: {
+            loader: "istanbul-instrumenter-loader",
+            options: { 
+                esModules: true // Cho phép chạy với code kiểu ES
+            },
         },
-        reporters: ['dots'],
-        
-        // Cấu hình webpack
-        webpack: webpackConfig,
-        webpackServer: {
-            noInfo: true
-        }
-    });
-};
+    }
+);
 ```
-- Thêm scripts vào `package.json`
+
+2. Thêm file nguồn vào cấu hình file của Karma
 ```json
-"scripts": {
-    "test": "karma start",
-    "test-normal": "mocha --exit test/**/*-Test.js"
-  }
-```
-- `test`: Để chạy UT với Karma
-- `test-normal`: Để chạy UT dựa vào mocha, ko tải UT lên bất kỳ trình duyệt nào. Hầu hết test cases sẽ lỗi.
-
-# Chạy test với Karma
-```
-npm run test
+files: [
+    "src/**/*.{js,jsx}"
+],
+preprocessors: {
+    "src/**/*.{js,jsx}": ["webpack"],
+},
 ```
 
-# Chạy test với chỉ Mocha
-```
-npm run test-normal
-```
-Cấu hình này để chứng minh phía FrontEnd, UT cần dựa vào Browser để chạy.
-
-# Debug
+3. Cấu hình quá trình test và report
 ```javascript
-autoWatch: true
-```
-Sau khi chạy với Karma xong, bạn bật Browser lên vào địa chỉ: http://localhost:9876/debug.html, sau đó F12/Inspect để vào DEV mode của Browser.
+reporters: ['progress', 'coverage-istanbul'], //Các kiểu report
+        
+coverageIstanbulReporter: {
+    dir : 'coverage/', // Kết quả được lưu trữ ở thư mục này
+    reports: ['html', 'text-summary'], // Xuất ra 2 kiểu này để xem
+    'report-config': {
+        html: {
+            subdir: 'html'
+        }
+    },
 
-Với Chrome, nếu bạn không thấy các file source, bạn có thể nhấn `^ + P`, sau đó nhập tên file vào.
+    // Cấu hình % mã nguồn được test để xem pass hay fail
+    thresholds: {
+        emitWarning: true, // true thì không báo fail khi kết quả không đạt tiêu chuẩn đề ra
+        
+        // cấu hình chung cho toàn bộ file
+        global: {
+            statements: 80,
+            lines: 80,
+            branches: 80,
+            functions: 80
+        },
+        // cấu hình cho từng file
+        each: {
+            statements: 80,
+            lines: 80,
+            branches: 80,
+            functions: 80,
+            overrides: {
+                'src/components/**/*.js': {
+                    statements: 50,
+                    lines: 50,
+                    branches: 50,
+                    functions: 50,
+                }
+            }
+        }
+    },
+},
+```
+
