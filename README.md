@@ -1,134 +1,102 @@
-### Khởi tạo ứng dụng ReactJS từ đầu với webpack
-Ở phần này mình sẽ trình bày những vấn đều sau
+# Cài đặt Unit Test với Karrma
+Trong phần này chúng ta sẽ đi qua các bước để thêm Unit Test vào cho dự án dựa trên thư viện Karma.
 
-1. Khởi tạo dự án và cài đặt các thư viện
-2. Giải thích cách bắt đầu dự án với webpack
+Tại sao phải là Karma: bởi vì các Unit Test framework thường sẽ không chạy code của bạn với Browser thực mà chạy với Browser ảo như PhantomJS hay JSDom. Karma sẽ hỗ trợ bạn chạy code Unit Test với Browser thực như Chrome, Firefox, ... 
 
+Bạn có thể tham khảo thêm: http://karma-runner.github.io/4.0/config/browsers.html
 
-**PROJECT_HOME**: là thư mục gốc chứa dự án 
-
-`--save-dev`: Nghĩa là chỉ sử dụng ở môi trường DEV, môi trường chạy thực không sử dụng những thư viện này.
-
-`--save`: Nghĩa là những thư viện cần khi chạy ứng dụng ở môi trường thực.
-
-## Khởi tạo dự án
+# Thư viện cho Unit Test thông thường:
 ```
-cd $PROJECT_HOME
-mkdir FE-UserManagement
-npm init
-
-# Cài đặt thư viện webpack
-npm i webpack webpack-cli --save-dev
-
-# Cài đặt Babel, bạn cần thư viện này để chuyển các mã code ở các phiên bản cao về ES5 và biên dịch code React sang javascript
-# Lý do chúng ta cần chuyển về phiên bản ES5 là các trình duyệt chưa hỗ trợ đầy đủ các phiên bản cao hơn.
-npm i @babel/core babel-loader @babel/preset-env @babel/preset-react --save-dev
-
-# Cài đặt thư viện ReactJS
-npm i react react-dom -save
-
-# Cài thư viện sinh mã html
-npm i html-webpack-plugin --save-dev
-
-# Thư viện này dùng để khởi tạo server ở local. Server ở phía môi trường DEV là bắt buộc trong quá trình phát triển dự án
-npm i webpack-dev-server --save-dev
-
-# Cài các bộ loader khác cho webpack để đọc file css, scss
-npm i style-loader css-loader sass-loader node-sass --save-dev
+npm i mocha chai --save-dev
 ```
+`Mocha`: Là Unit Test framework, sử dụng cả Front End, Back End, thư viện này sẽ giúp chúng ta viết các test cases cần thiết.
 
-## Cấu hình để chạy với Webpack
-- File `.babelrc` dùng để cấu hình Babel, bạn có thể tạo với nội dung như sau
+`Chai`: Thư viện này giúp chúng ta có thể viết assertion cho test cases.
+
+`Sinon`: Thư viện cho việc Mocking đầu vào, bạn có thể tìm hiểu thêm, trong phạm vi bài này không sử dụng thư viện này. 
+
+# Thư viện cho Karma
 ```
-{
-    "presets": [
-        "@babel/env",
-        "@babel/react"
-    ]
+npm i karma karma-chrome-launcher karma-firefox-launcher karma-cli karma-mocha karma-sourcemap-loader karma-webpack puppeteer --save-dev
+```
+`Karma`, `Karma-cli`: Thư viện chính của Karma
+
+`*-laucher`: Giúp chúng ta có thể chạy test được trên các Browser tương ứng như Chrome, Firefox, ...
+
+`puppeteer`: Bộ Chromium phát triển bở Google, chúng ta sẽ nói nhiều hơn ở phần Automation test.
+
+# Cấu hình dự án
+- Bạn thêm dòng này vào `webpack.config.js` để có thể thấy source code và debug ở môi trường DEV
+```javascript
+module.exports = {
+    devtool: 'inline-source-map',
 }
 ```
-- File `webpack.config.js` để cấu hình Webpack
-```
-const HtmlWebPackPlugin = require("html-webpack-plugin");
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const path = require('path');
+- `karma.conf.js`
+```javascript
+var webpackConfig = require('./webpack.config.js');
 
-module.exports = {
-    entry: "./src/index.js",
+process.env.CHROME_BIN = require('puppeteer').executablePath()
 
-    output: {
-        path: path.resolve(__dirname, './dist'),
-        filename: 'bundle.js'
-    },
+module.exports = function (config) {
+    config.set({
+        // Framework sử dụng ở bài này là mocha, nếu bạn sử dụng fw khác, có thể thêm vào
+        frameworks: ['mocha'],
 
-    module: {
-        rules: [
-            {
-                test: /\.(js|jsx)$/i,
-                exclude: /node_modules/,
-                use: {
-                    loader: "babel-loader"
-                }
-            },
-            {
-                test: /\.(css|s[ac]ss)$/i, 
-                use: [
-                    'style-loader',
-                    {
-                        loader: "css-loader",
-                        options: {
-                            modules: true
-                        }
-                    },
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                          implementation: require('node-sass'),
-                        },
-                    }
-                ]
-            },
-            {
-                test: /\.html$/,
-                use: [
-                    {
-                        loader: "html-loader"
-                    }
-                ]
-            }
-        ]
-    },
+        port: 9876, // Port chạy debug
+        colors: true,
+        logLevel: config.LOG_INFO,
+        autoWatch: false, // True nghĩa là chạy và chờ các file test thay đổi để chạy lại, chờ để debug,... Môi trường PRO bạn cần đặt là false.
+        // browsers: ['Chrome', 'Firefox'],
+        browsers: ['ChromeHeadless', 'FirefoxHeadless'],
+        singleRun: false, // Chạy song song hay chạy đồng thời trên các Browsers
+        autoWatchBatchDelay: 300,
+        
+        // Danh sách các file sẽ được load vào Browser để chạy test
+        files: [
+            'test/suites/helloworld-test-suite.js',
+            // 'test/**/*-Test.js',
+		],
 
-    plugins: [
-        new CleanWebpackPlugin(),
-        new HtmlWebPackPlugin({
-            template: "./src/index.html",
-            filename: "./index.html"
-        })
-    ]
+        preprocessors: {
+            'test/suites/helloworld-test-suite.js': ['webpack', 'sourcemap']
+            // 'test/**/*-Test.js': ['webpack', 'sourcemap']
+        },
+        reporters: ['dots'],
+        
+        // Cấu hình webpack
+        webpack: webpackConfig,
+        webpackServer: {
+            noInfo: true
+        }
+    });
 };
 ```
 - Thêm scripts vào `package.json`
-```
+```json
 "scripts": {
-    "start": "webpack-dev-server --mode development",
-    "build": "webpack --mode production"
-}
+    "test": "karma start",
+    "test-normal": "mocha --exit test/**/*-Test.js"
+  }
+```
+- `test`: Để chạy UT với Karma
+- `test-normal`: Để chạy UT dựa vào mocha, ko tải UT lên bất kỳ trình duyệt nào. Hầu hết test cases sẽ lỗi.
+
+# Chạy test với Karma
+```
+npm run test
 ```
 
-## Thử chạy ứng dụng ở local
+# Chạy test với chỉ Mocha
 ```
-npm run start
-``` 
-Sau khi chạy server xong bạn bật browser ở địa chỉ http://localhost:8080/ để xem kết quả
-
-**Tips**
-
-- Nếu bạn muốn tự bật Browser thì thêm tham số `--open`
-- Nếu bạn muốn chỉ rebuild những module được thay đổi thôi thì thêm tham số `--hot`
-
-## Build ứng dụng
+npm run test-normal
 ```
-npm run build
-``` 
-Các file output sẻ được tạo ra trong thư mục `dist`
+Cấu hình này để chứng minh phía FrontEnd, UT cần dựa vào Browser để chạy.
+
+# Debug
+```javascript
+autoWatch: true
+```
+Sau khi chạy với Karma xong, bạn bật Browser lên vào địa chỉ: http://localhost:9876/debug.html, sau đó F12/Inspect để vào DEV mode của Browser.
+
+Với Chrome, nếu bạn không thấy các file source, bạn có thể nhấn `^ + P`, sau đó nhập tên file vào.
