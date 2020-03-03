@@ -8,19 +8,19 @@ module.exports = function (config) {
         port: 9876,
         colors: true,
         logLevel: config.LOG_INFO,
-        autoWatch: false,   // True means: Keep running and watching for changes, debugging, ...
+        autoWatch: false,   // Watching for changes and re-running
         // browsers: ['Chrome', 'Firefox'],  // Non headless mode
         browsers: ['ChromeHeadless', 'FirefoxHeadless'],  // Headless mode
-        singleRun: false,    // If true, run the browsers one by one
+        singleRun: true,    // Run then exist or keep running for new changes
         autoWatchBatchDelay: 300,
         
         files: [
-            'test/suites/helloworld-test-suite.js',
+            'test/suites/test-suite.js',
             // 'test/**/*-Test.js',
 		],
 
         preprocessors: {
-            'test/suites/helloworld-test-suite.js': ['webpack', 'sourcemap']
+            'test/suites/test-suite.js': ['webpack', 'sourcemap']
             // 'test/**/*-Test.js': ['webpack', 'sourcemap']
         },
         reporters: ['dots'], //report results in this format

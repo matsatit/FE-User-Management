@@ -46,10 +46,10 @@ module.exports = function (config) {
         port: 9876, // Port chạy debug
         colors: true,
         logLevel: config.LOG_INFO,
-        autoWatch: false, // True nghĩa là chạy và chờ các file test thay đổi để chạy lại, chờ để debug,... Môi trường PRO bạn cần đặt là false.
+        autoWatch: false, // True nghĩa là tự lắng nghe các file test thay đổi để chạy lại
         // browsers: ['Chrome', 'Firefox'],
         browsers: ['ChromeHeadless', 'FirefoxHeadless'],
-        singleRun: false, // Chạy song song hay chạy đồng thời trên các Browsers
+        singleRun: false, // Chạy một lần rồ thoát luôn hay chờ thay đổi để chạy lại
         autoWatchBatchDelay: 300,
         
         // Danh sách các file sẽ được load vào Browser để chạy test
