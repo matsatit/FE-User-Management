@@ -192,29 +192,60 @@ Các file output sẽ được tạo ra trong thư mục `dist`, nó như thế 
 # 🌴 Unit Test ở Front End với Karma
 Lại là Unit Test 😂😂😂, mình giám chắc hơn 50% bạn đọc bài này đều ghét cay ghét đắng UT. Mình cũng từng như vậy, những năm đầu đời nghề làm Dev mình cũng rất ghét UT, sau vài năm thì không còn ghét nữa vì nó là việc phải làm 🤣🤣🤣.
 
-**Một số khái niệm bạn nên có trước khi đọc tiếp bài viết:**
-- [Unit Test](https://en.wikipedia.org/wiki/Unit_testing): Khái niệm cơ bản về Unit Test hoặc [What is Unit Testing?](https://www.guru99.com/unit-testing-guide.html) để biết có những loại UT gì khi phát triển phần mềm
+UT là việc kiểm thử code đã viết ra ở giai đoạn phát triển, nó có thể viết trước, viết sau hay cùng viết với code chính của một chức năng nào đó, nó tùy thuộc vào dự án bạn đang làm chọn phương án nào.
+
+**Một số khái niệm về UT:**
+- [Unit Test](https://en.wikipedia.org/wiki/Unit_testing): Khái niệm cơ bản về Unit Test
+- [Unit Testing Tutorial: What is, Types, Tools, EXAMPLE](https://www.guru99.com/unit-testing-guide.html) Các khái niệm khác liên quan đến test một sản phẩm.
 - [Mocha](https://mochajs.org/): Là 1 test framework, tích hợp tốt với NodeJS và cả Browser. Đặc điểm của Framework này là cho phép bạn tùy biến các công cụ liên quan như mocking, assertion, ... dễ dàng.
 - [Chai](https://www.chaijs.com/): Thư viện hỗ trợ tạo các assertion khi viết test case.
 - Spy, Stub, Mock: Là các cách để tạo dữ liệu ảo, hàm ảo, service, ... ảo cho đầu vào của 1 test case, các bạn đọc thêm [Sinon](https://sinonjs.org/)
-- [Jest](https://jestjs.io/): Cũng là test framework được cung cấp bởi Facebook. Jest tích hợp khá nhiều cung cụ cho việc viết Unit Test, với Jest thì bạn không cần cấu hình thêm gì, sau khi cài là có thể sử dụng. Thông thường bạn chỉ cần chọn Jest hoặc bộ 3 Mocha, Chai, Sinon là đủ cho việc viết UT.
-- [Enzyme](https://enzymejs.github.io/enzyme/): Thư viện khá tốt hỗ trợ việc viết UT cho React Component.
-- [JSDom](https://github.com/jsdom/jsdom/blob/master/README.md): Trình duyệt web ảo với nhiều hạn chế so với trình duyệt thực như Chrome, Firefox, ... Các testing framework ở phía FrontEnd thường tích hợp với thư viện này cho việc chạy test cases.
+- [Jest](https://jestjs.io/): Cũng là test framework được cung cấp bởi Facebook. Jest tích hợp khá nhiều cung cụ cho việc viết Unit Test, với Jest thì bạn không cần cài đặt thêm gì nhiều. Thông thường bạn chỉ cần chọn Jest hoặc bộ 3 Mocha, Chai, Sinon là đủ cho việc viết UT.
+- [Enzyme](https://enzymejs.github.io/enzyme/): Bộ công cụ khá tốt để viết UT cho React Component.
+- [JSDom](https://github.com/jsdom/jsdom/blob/master/README.md): Là bộ mô phỏng trình duyệt thực như Chrome, Firefox, ... với nhiều hạn chế về chức năng. Ưu điểm của nó là nhanh hơn trình duyệt thực. Các testing framework ở phía FrontEnd thường tích hợp với thư viện này cho việc chạy test cases.
 - [Karma](http://karma-runner.github.io/4.0/intro/how-it-works.html): Test Runner, hỗ trợ chạy UT trên nhiều Browser THỰC khác nhau, report, debug, ...
 
 **Nếu bạn đọc hết các link trên thì quá đủ để hiểu UT rồi đó, còn đây là khái niệm của mình về UT:**
 - Nó là 1 đoạn code để test các chức năng mình đã làm ra.
-> Ví dụ: bạn viết 1 hàm để in chữ "Hello World", làm sao bạn giám chắc hàm đó chạy đúng mà không phải chạy thử ứng dụng để kiểm tra? Viết UT là một trong các cách có thể làm.
-- UT là code để test cho từng đơn vị (unit) code nhỏ nhất mình đã tạo ra.
-> Ví dụ: bạn tạo ra một class, 1 file js, ... trong đó có nhiều hàm khác nhau, thì UT là code để test độc lập từng hàm trong file đó, UT không cho phép bạn test một hàm mà hàm đó vẫn còn phụ thuộc vào 1 hàm khác.
-- UT để đảm bảo code của mình chạy đúng như mình mong muốn trước khi chuyển qua các giai đoạn khác như Deployment, Manual test, ... thường sẽ tốn rất nhiều thời gian để sửa lỗi mà bạn đã tạo ra so với UT.
+> Ví dụ: bạn viết 1 hàm để in chữ "Hello World", làm sao bạn giám chắc hàm đó chạy đúng mà không phải chạy thử ứng dụng để kiểm tra? Viết UT là một trong các cách bạn có thể làm.
+- UT để đảm bảo code của mình chạy đúng như mình mong muốn trước khi chuyển qua các giai đoạn khác như Manual test, Deployment, ... thường sẽ tốn rất nhiều thời gian để sửa lỗi mà bạn đã tạo ra so với UT.
+> Ví dụ:
+>
+> Dự án của bạn có 2 công đoạn là Code + UT và Manual Test (được thực hiện bở đội Tester).
+>
+> Giả sử bạn code 1 hàm A(), bạn viết UT không cẩn thận để phát hiện hết các lỗi cần thiết.
+>
+> Đến công đoạn Manual Test, bạn Tester phát hiện ra, report bug đó lên hệ thống, các PO, PM vào xem và đánh giá, assign lại cho bạn hay ai đó khác để fix.
+>
+> 😱 Dự án cần rất nhiều công sức để giải quyết bug đó so với thời điểm viết UT.
+
 - UT là để một người nào đó sau vài năm khi vào bảo trì (maintain) sản phẩm của bạn, dù không hiểu hết các chức năng bạn đã viết là gì, nhưng vẫn giám chắc chức năng mới mà người đó viết không làm hỏng các chức năng mà bạn viết.
-- UT là để kiểm thử các trường hợp mà rất rất rất khó phát hiện ở môi trường thực. Với UT bạn sẽ tạo những code giả, dữ liệu giả để kiểm thử các chức năng như vậy thay vì đợi dữ liệu thực để xem nó hoạt động thế nào.
-- ... và cuối cùng UT là để cãi lại với Dev khác, code mình làm ra hoàn toàn đúng như kịch bản 😘, zụ này thường xuyên gặp nếu bạn tham gia vào dự án có nhiều module độc lập nhau trong quá trình phát triển.
+
+- UT là để kiểm thử các trường hợp rất khó phát hiện ở môi trường thực. Với UT bạn có thể tạo những code giả, dữ liệu giả để kiểm thử các chức năng như vậy thay vì đợi dữ liệu thực để xem nó hoạt động thế nào.
+> Ví dụ:
+>
+> Ứng dụng bạn có 1 chức năng là cứ sau 24 giờ các thông số sẽ được thiết lập lại thành các giá trị mặc định.
+>
+> Trong trường hợp như vậy để biết ứng dụng chạy đúng hay không trong môi trường thực khá là mất thời gian, tuy nhiên việc đó khá đơn giản với UT.
+
+- Để cãi lại với Dev khác, code mình làm ra hoàn toàn đúng như kịch bản 😘.
+> Ví dụ:
+> 
+> Dự án bạn có 1 chức năng được phát triển bởi 3 người cùng lúc với 3 hàm khác nhau. 
+>
+>- Func 1 là lấy thông tin đầu vào
+>- Func 2 là xử lý logic của thông tin đầu vào
+>- Func 3 là lưu thông tin đó vào DB
+>
+> Ở đây bạn thấy sự phụ thuộc của 3 hàm này với nhau. Như vậy làm sao bạn phát triển được Func 2 tốt mà không bị ảnh hưởng bởi tiến độ cũng như output của Func 1? UT là một trong các cách bạn có thể làm để giải quyết vấn đề đó, bạn có thể giả dữ liệu của Func 1 để kiểm thử Func 2 mình đang làm để đảm bảo Func 2 chạy đúng như mong muốn.
+
+- Và còn rất nhiều trường hợp bạn có thể giải quyết với UT nhưng UT nó có **nhược điểm là nó sẽ mất thêm khoảng từ 10% -> 25% thời gian làm 1 task**, nên khi estimate bạn nên nhớ cộng con số này vào để tránh OT, ON nhé 😂😂😂
+
 
 **Tại sao là "Unit Test ở Front End với Karma"**
 
-1. Bạn cần biết rằng: web application là ứng dụng được chạy dựa trên các trình duyệt và bản thân ứng dụng đó chứa rất nhiều code mà chỉ có trình duyệt mới hiểu. Do đó việc chạy UT bạn cũng phải dựa vào các trình duyệt để chạy chứ không phải chỉ dựa vào NodeJS như việc viết UT ở phía BackEnd được.
+1. Bạn cần biết rằng: web application là ứng dụng được chạy dựa trên các trình duyệt và bản thân ứng dụng đó chứa rất nhiều code mà chỉ có trình duyệt mới hiểu. Do đó việc chạy UT bạn cũng phải dựa vào các trình duyệt để chạy chứ không phải chỉ dựa vào Framework như việc viết UT ở phía BackEnd được.
+
 2. Các UT Framework (UT-F) ở phía FrontEnd thông thường không mặc định tích hợp việc chạy UT trên bất kỳ trình duyệt nào, mà là JSDom. Việc cấu hình để UT-F chạy với các trình duyệt khác nhau là hoàn toàn có thể, tuy nhiên nó không dễ dàng chút nào 😂😂😂, do đó mình giới thiệu đến các bạn thư viện Karma, một thư viện khá mạnh cho việc chạy UT với các trình duyệt khác nhau, report kết quả UT và hỗ trợ debug code của UT.
 
 #### Cài đặt Unit Test với Karma
@@ -222,7 +253,7 @@ Lại là Unit Test 😂😂😂, mình giám chắc hơn 50% bạn đọc bài 
 ```
 npm i mocha chai --save-dev
 ```
-> UT-F sẽ hỗ trợ chúng ta trong quá trình viết UT, nếu bạn thích Jest hay UT-F nào khác thì các bạn có thể chọn nó.
+> UT-F sẽ hỗ trợ chúng ta trong quá trình viết UT, nếu bạn thích UT-F nào khác thì các bạn có thể chọn nó.
 
 ##### Cài các thư viện Karma
 ```
@@ -232,10 +263,10 @@ npm i karma karma-chrome-launcher karma-firefox-launcher karma-cli karma-mocha k
 
 - `*-laucher`: Giúp chúng ta có thể chạy UT được trên các Browser tương ứng như Chrome, Firefox, ...
 
-- `puppeteer`: Bộ Chromium phát triển bở Google, chúng ta sẽ nói nhiều hơn ở phần `Automation Test`.
+- `puppeteer`: Bộ Chromium phát triển bởi Google, chúng ta sẽ nói nhiều hơn ở phần `Automation Test`.
 
 #### Cấu hình dự án
-- Bạn thêm dòng này vào `webpack.config.js` để có thể thấy source code gốc khi debug ở môi trường DEV
+- Bạn thêm dòng này vào `webpack.config.js` để có thể thấy source code gốc khi debug ở môi trường DEV. Bạn xem thêm tài liệu [Devtool](https://webpack.js.org/configuration/devtool/) cho các tham số.
 ```javascript
 module.exports = {
     devtool: 'inline-source-map',
@@ -260,22 +291,23 @@ module.exports = function (config) {
         port: 9876, // Port chạy debug
         colors: true,
         logLevel: config.LOG_INFO,
-        autoWatch: false, // True nghĩa là tự lắng nghe các file test thay đổi để chạy lại
+        autoWatch: false, // True nghĩa là tự lắng nghe các file thay đổi để chạy lại
         // browsers: ['Chrome', 'Firefox'],
         // Bạn muốn hiểu Headless là gì thì có thể đọc ở đây: https://developers.google.com/web/updates/2017/04/headless-chrome
         browsers: ['ChromeHeadless', 'FirefoxHeadless'],
         singleRun: false, // Chạy một lần rồi thoát luôn hay chờ thay đổi để chạy lại. Ở mode PRO bạn cần đặt nó là true
         autoWatchBatchDelay: 300,
         
-        // Danh sách các file sẽ được load vào Browser để chạy test
+        // Danh sách các file được load vào Browser trong quá trình chạy test
+        // Bạn xem tài liệu http://karma-runner.github.io/4.0/config/configuration-file.html phần File Patterns để biết cú pháp tìm files
         files: [
-            'test/suites/helloworld-test-suite.js',
+            'test/suites/test-suite.js',
             // 'test/**/*-Test.js',
 		],
 
-        // Bạn cần làm gì với UT code trước khi chạy, ở đây mình muốn webpack thực hiện các công việc nó làm như chạy source code ứng dụng ở phần trước
+        // Tiền xử lý trước khi chạy
         preprocessors: {
-            'test/suites/helloworld-test-suite.js': ['webpack', 'sourcemap']
+            'test/suites/test-suite.js': ['webpack', 'sourcemap']
             // 'test/**/*-Test.js': ['webpack', 'sourcemap']
         },
         reporters: ['dots'],
@@ -293,11 +325,24 @@ module.exports = function (config) {
 ```json
 "scripts": {
     "test": "karma start",
-    "test-normal": "mocha --exit test/**/*-Test.js"
+    "test-normal": "mocha --require @babel/register --exit test/**/*-Test.js"
   }
 ```
 - `test`: Để chạy UT với Karma
-- `test-normal`: Để chạy UT thuần với NodeJS, ko tải UT lên bất kỳ trình duyệt nào. Hầu hết test cases sẽ lỗi.
+- `test-normal`: Để chạy UT thuần với môi trường Node, ko tải UT lên bất kỳ trình duyệt nào. Hầu hết test cases sẽ lỗi.
+
+#### Chuẩn bị source code
+Bạn có thể lấy source từ đây để trải nghiệm
+```
+cd $PROJECT_HOME
+
+# Lệnh này sẽ checkout duy nhất branch InitUnitTest 
+git clone --single-branch --branch InitUnitTest https://github.com/lapth/FE-User-Management.git
+
+cd FE-User-Management
+
+npm install
+```
 
 #### Chạy test với Karma
 ```
@@ -307,7 +352,7 @@ Kết quả chạy của bạn trông nó như thế này
 ![](https://usermanagement-sample.firebaseapp.com/images/InitUnitTest_Test_OK_Result.png)
 
 
-#### Chạy test với chỉ Mocha
+#### Chạy test thuần
 ```
 npm run test-normal
 ```
@@ -333,5 +378,5 @@ Màn hình debug của bạn trông như sau:
 ![](https://usermanagement-sample.firebaseapp.com/images/InitUnitTest_Test_Debug.png)
 
 #### Tạm kết
-Vậy là bạn đã quen thuộc với UT rồi heng. Chúc các bạn thành công!
+Vậy là bạn đã quen thuộc với UT rồi heng, hy vọng sau khi đọc bài viết này bạn không còn cảm thấy khó chịu khi viết UT nữa. Chúc các bạn thành công!
 
