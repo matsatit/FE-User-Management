@@ -21,7 +21,7 @@ webpackConfig.module.rules.push(
     }
 );
 
-process.env.CHROME_BIN = require('puppeteer').executablePath()
+process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 module.exports = function (config) {
     config.set({
@@ -39,7 +39,7 @@ module.exports = function (config) {
         autoWatchBatchDelay: 300,
         
         files: [
-            'test/suites/helloworld-test-suite.js',
+            'test/suites/test-suite.js',
             // 'test/**/*-Test.js',
             'src/**/*.{js,jsx}'
         ],
@@ -48,7 +48,7 @@ module.exports = function (config) {
         exclude: [],
 
         preprocessors: {
-            'test/suites/helloworld-test-suite.js': ['webpack', 'sourcemap'],
+            'test/suites/test-suite.js': ['webpack', 'sourcemap'],
             // 'test/**/*-Test.js': ['webpack', 'sourcemap']
 
             'src/**/*.{js,jsx}': ['webpack'],
@@ -58,7 +58,7 @@ module.exports = function (config) {
         
         coverageIstanbulReporter: {
             dir : 'coverage/',
-            // ttps://github.com/istanbuljs/istanbuljs/tree/aae256fb8b9a3d19414dcf069c592e88712c32c6/packages/istanbul-reports/lib
+            // https://github.com/istanbuljs/istanbuljs/tree/aae256fb8b9a3d19414dcf069c592e88712c32c6/packages/istanbul-reports/lib
             reports: ['html', 'text-summary'],
             'report-config': {
                 // https://github.com/istanbuljs/istanbuljs/blob/aae256fb8b9a3d19414dcf069c592e88712c32c6/packages/istanbul-reports/lib/html/index.js#L135-L137

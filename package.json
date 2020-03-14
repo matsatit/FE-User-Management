@@ -6,7 +6,7 @@
     "start": "webpack-dev-server --mode development",
     "build": "webpack --mode production",
     "test": "karma start",
-    "test-normal": "mocha --exit test/**/*-Test.js"
+    "test-normal": "mocha --require @babel/register --exit test/**/*-Test.js"
   },
   "author": "Lap Tran",
   "license": "ISC",
@@ -14,6 +14,7 @@
     "@babel/core": "^7.8.6",
     "@babel/preset-env": "^7.8.6",
     "@babel/preset-react": "^7.8.3",
+    "@babel/register": "^7.8.6",
     "babel-loader": "^8.0.6",
     "chai": "^4.2.0",
     "clean-webpack-plugin": "^3.0.0",
