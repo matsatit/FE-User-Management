@@ -1,4 +1,8 @@
-// Đây là cách cài đặt test suite, bạn xem thêm tài liệu của Karma
+// Load source and test
+// Ref: https://webpack.js.org/loaders/istanbul-instrumenter-loader/
 
-var context = require.context('../', true, /-test\.(js|jsx)$/i);
-context.keys().forEach(context);
+var tests = require.context('../', true, /-test\.(js|jsx)$/i);
+tests.keys().forEach(tests);
+
+var sources = require.context('../../src/', true, /\.(js|jsx)$/i);
+sources.keys().forEach(sources);

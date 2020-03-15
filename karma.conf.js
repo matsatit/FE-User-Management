@@ -34,24 +34,21 @@ module.exports = function (config) {
         logLevel: config.LOG_INFO,
         autoWatch: false,   // True means: watching for changes and re-running
         // browsers: ['Chrome', 'Firefox'],  // Non headless mode
-        browsers: ['ChromeHeadless', 'FirefoxHeadless'],  // Headless mode
+        browsers: ['ChromeHeadless'],  // Headless mode
         singleRun: true,    // If true, run one time then exit otherwise keeping running
         autoWatchBatchDelay: 300,
         
         files: [
             'test/suites/test-suite.js',
             // 'test/**/*-Test.js',
-            'src/**/*.{js,jsx}'
         ],
         
         // list of files to exclude
         exclude: [],
 
         preprocessors: {
-            'test/suites/test-suite.js': ['webpack', 'sourcemap'],
-            // 'test/**/*-Test.js': ['webpack', 'sourcemap']
-
-            'src/**/*.{js,jsx}': ['webpack'],
+            'test/suites/test-suite.js': ['webpack'],
+            // 'test/**/*-Test.js': ['webpack']
         },
 
         reporters: ['progress', 'coverage-istanbul'], //report results in this format
@@ -59,7 +56,7 @@ module.exports = function (config) {
         coverageIstanbulReporter: {
             dir : 'coverage/',
             // https://github.com/istanbuljs/istanbuljs/tree/aae256fb8b9a3d19414dcf069c592e88712c32c6/packages/istanbul-reports/lib
-            reports: ['html', 'text-summary'],
+            reports: ['html', 'text-summary', 'lcov'],
             'report-config': {
                 // https://github.com/istanbuljs/istanbuljs/blob/aae256fb8b9a3d19414dcf069c592e88712c32c6/packages/istanbul-reports/lib/html/index.js#L135-L137
                 html: {
@@ -67,6 +64,7 @@ module.exports = function (config) {
                     subdir: 'html'
                 }
             },
+            fixWebpackSourcePaths: true,
             // enforce percentage thresholds
             // anything under these percentages will cause karma to fail with an exit code of 1 if not running in watch mode
             thresholds: {
